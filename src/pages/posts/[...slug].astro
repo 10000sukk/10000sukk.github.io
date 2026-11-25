@@ -4,7 +4,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import BackBar from '../../components/BackBar.astro';
 import Comments from '../../components/Comments.astro';
-import { SITE_TITLE } from '../../consts';
+import { REPO_BRANCH, REPO_URL, SITE_TITLE } from '../../consts';
 import { formatDate, getPosts, postHref, readingMinutes, tagHref, type Post } from '../../lib/posts';
 
 export const getStaticPaths = (async () => {
@@ -21,6 +21,9 @@ interface Props { post: Post; older?: Post; newer?: Post }
 const { post, older, newer } = Astro.props;
 const { Content } = await render(post);
 const primary = post.data.tags[0];
+const file = post.filePath ?? `src/content/posts/${post.id}.md`;
+const editUrl = `${REPO_URL}/edit/${REPO_BRANCH}/${file}`;
+const deleteUrl = `${REPO_URL}/delete/${REPO_BRANCH}/${file}`;
 ---
 <Base title={post.data.title} description={post.data.description} activeTag={primary} image={post.data.cover}>
   <BackBar crumbs={[{ label: '홈', href: '/' }, { label: primary, href: tagHref(primary) }, { label: '글' }]} fallback={tagHref(primary)} />
@@ -31,6 +34,10 @@ const primary = post.data.tags[0];
     </div>
     <h1>{post.data.title}</h1>
     <div class="m">{formatDate(post.data.date)} · {readingMinutes(post.body)}분 읽기{post.data.draft && ' · 초안'}</div>
+    <div class="owner-tools" data-owner hidden>
+      <a href={editUrl} target="_blank" rel="noopener">✎ 수정</a>
+      <a class="del" href={deleteUrl} target="_blank" rel="noopener" data-confirm={`"${post.data.title}" 글을 삭제할까요? GitHub 에서 커밋하면 1~2분 뒤 사이트에서 사라져요.`}>삭제</a>
+    </div>
   </header>
 
   {post.data.cover && <img class="pcover" src={post.data.cover} alt="" />}

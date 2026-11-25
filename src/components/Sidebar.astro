@@ -1,5 +1,5 @@
 ---
-import { GITHUB_URL, SITE_TITLE } from '../consts';
+import { GITHUB_URL, REPO_BRANCH, REPO_URL, SITE_TITLE } from '../consts';
 import { categorySet, getPosts, tagsAlphabetical, tagHref } from '../lib/posts';
 
 interface Props { activeTag?: string; activePage?: 'home' | 'about' }
@@ -24,6 +24,10 @@ const i = () => `--i:${n++}`;
       <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13.5 13.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       검색<kbd>⌘K</kbd>
     </button>
+    <a class="sb-write" style={i()} data-owner data-new-post={`${REPO_URL}/new/${REPO_BRANCH}/src/content/posts`} href={`${REPO_URL}/new/${REPO_BRANCH}/src/content/posts`} target="_blank" rel="noopener" hidden>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 16h3l8.5-8.5a2.1 2.1 0 0 0-3-3L4 13v3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      새 글 쓰기
+    </a>
     <a href="/" style={i()} class:list={[{ on: activePage === 'home' }]}>홈</a>
     {categories.length > 0 && <div class="lab" style={i()}>Categories</div>}
     {categories.map(({ tag, count }) => (
