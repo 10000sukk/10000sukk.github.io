@@ -1,35 +1,77 @@
 ---
 import { GITHUB_URL, SITE_TITLE } from '../consts';
-import { getPosts, tagsAlphabetical, tagHref } from '../lib/posts';
+import { categorySet, getPosts, tagsAlphabetical, tagHref } from '../lib/posts';
 
 interface Props { activeTag?: string; activePage?: 'home' | 'about' }
 const { activeTag, activePage } = Astro.props;
-const tags = tagsAlphabetical(await getPosts());
+const posts = await getPosts();
+const cats = categorySet(posts);
+const all = tagsAlphabetical(posts);
+const categories = all.filter((t) => cats.has(t.tag));
+const tags = all.filter((t) => !cats.has(t.tag));
+let n = 0; // stagger index for the nav items
+const i = () => `--i:${n++}`;
 ---
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sb-top">
     <a class="sb-brand" href="/"><img src="/logo.png" alt="" /><span>{SITE_TITLE}</span></a>
-    <button class="sb-toggle" id="sb-toggle" type="button" aria-label="메뉴 접기/펼치기">
-      <span class="when-open">⟨</span><span class="when-collapsed">☰</span>
+    <button class="sb-toggle" id="sb-toggle" type="button" aria-label="메뉴 접기/펼치기" aria-controls="sidebar">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
   <nav class="sb-nav">
-    <a href="/" class:list={[{ on: activePage === 'home' }]}>홈</a>
-    {tags.length > 0 && <div class="lab">Tags</div>}
-    {tags.map(({ tag, count }) => (
-      <a href={tagHref(tag)} class:list={[{ on: activeTag === tag }]}>{tag}<span>{count}</span></a>
+    <button type="button" class="sb-search" style={i()} data-open-search>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13.5 13.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      검색<kbd>⌘K</kbd>
+    </button>
+    <a href="/" style={i()} class:list={[{ on: activePage === 'home' }]}>홈</a>
+    {categories.length > 0 && <div class="lab" style={i()}>Categories</div>}
+    {categories.map(({ tag, count }) => (
+      <a href={tagHref(tag)} style={i()} class:list={[{ on: activeTag === tag }]}>{tag}<span>{count}</span></a>
     ))}
-    <div class="lab">Links</div>
-    <a href="/about/" class:list={[{ on: activePage === 'about' }]}>소개</a>
-    <a href={GITHUB_URL} target="_blank" rel="noopener">GitHub ↗</a>
+    {tags.length > 0 && <div class="lab" style={i()}>Tags</div>}
+    {tags.map(({ tag, count }) => (
+      <a class="tg" href={tagHref(tag)} style={i()} class:list={[{ on: activeTag === tag }]}>#{tag}<span>{count}</span></a>
+    ))}
+    <div class="lab" style={i()}>Links</div>
+    <a href="/about/" style={i()} class:list={[{ on: activePage === 'about' }]}>소개</a>
+    <a href={GITHUB_URL} style={i()} target="_blank" rel="noopener">GitHub ↗</a>
   </nav>
   <div class="sb-foot">© {new Date().getFullYear()} {SITE_TITLE}</div>
 </aside>
+<div class="sb-backdrop" id="sb-backdrop" aria-hidden="true"></div>
 
 <script>
   const KEY = 'sb-collapsed';
+  const root = document.documentElement;
+  const mobile = window.matchMedia('(max-width: 820px)');
+  const CLOSE_MS = 280;
+
+  const openDrawer = () => { root.classList.add('sb-open'); document.body.style.overflow = 'hidden'; };
+  const closeDrawer = () => { root.classList.remove('sb-open'); document.body.style.overflow = ''; };
+
+  // Desktop: collapse/expand the rail (remembered). Mobile: the same button closes the drawer.
   document.getElementById('sb-toggle')?.addEventListener('click', () => {
-    const collapsed = document.documentElement.classList.toggle('sb-collapsed');
+    if (mobile.matches) return closeDrawer();
+    const collapsed = root.classList.toggle('sb-collapsed');
     try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch {}
+  });
+  document.querySelectorAll('[data-open-menu]').forEach((b) => b.addEventListener('click', openDrawer));
+  document.getElementById('sb-backdrop')?.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+  mobile.addEventListener('change', closeDrawer);
+  // Coming back via the back button restores the page from cache with the drawer still open.
+  window.addEventListener('pageshow', (e) => { if (e.persisted) closeDrawer(); });
+
+  // Mobile: tapping a menu link closes the drawer first, then moves to the page.
+  document.querySelectorAll<HTMLAnchorElement>('.sidebar a').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      if (!mobile.matches || !root.classList.contains('sb-open')) return;
+      if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return closeDrawer();
+      e.preventDefault();
+      closeDrawer();
+      const same = new URL(a.href).pathname === location.pathname;
+      if (!same) setTimeout(() => { location.href = a.href; }, CLOSE_MS);
+    });
   });
 </script>

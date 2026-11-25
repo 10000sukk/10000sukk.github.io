@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import BackBar from '../../components/BackBar.astro';
+import Comments from '../../components/Comments.astro';
 import { SITE_TITLE } from '../../consts';
 import { formatDate, getPosts, postHref, readingMinutes, tagHref, type Post } from '../../lib/posts';
 
@@ -26,7 +27,7 @@ const primary = post.data.tags[0];
 
   <header class="ph2">
     <div class="chips">
-      {post.data.tags.map((t, i) => <a class:list={['chip', { first: i === 0 }]} href={tagHref(t)}>{t}</a>)}
+      {post.data.tags.map((t, i) => <a class:list={['chip', { first: i === 0 }]} href={tagHref(t)}>{i === 0 ? t : `#${t}`}</a>)}
     </div>
     <h1>{post.data.title}</h1>
     <div class="m">{formatDate(post.data.date)} · {readingMinutes(post.body)}분 읽기{post.data.draft && ' · 초안'}</div>
@@ -42,6 +43,8 @@ const primary = post.data.tags[0];
       {newer && <a class="next" href={postHref(newer)}><small>다음 글 →</small><div>{newer.data.title}</div></a>}
     </nav>
   )}
+
+  <Comments />
 
   <footer class="site">© {new Date().getFullYear()} {SITE_TITLE}</footer>
 </Base>

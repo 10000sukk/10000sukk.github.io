@@ -1,0 +1,104 @@
+<div class="search" id="search" hidden>
+  <div class="search-backdrop" data-close></div>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="글 검색">
+    <div class="search-in">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m13.5 13.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="search-q" type="search" placeholder="제목, 내용, 태그로 찾기" autocomplete="off" spellcheck="false" />
+      <button type="button" class="search-esc" data-close>ESC</button>
+    </div>
+    <ul class="search-res" id="search-res"></ul>
+    <p class="search-hint" id="search-hint">검색어를 입력하세요.</p>
+  </div>
+</div>
+
+<script>
+  type Item = { title: string; description: string; tags: string[]; date: string; url: string; body: string };
+  const box = document.getElementById('search')!;
+  const q = document.getElementById('search-q') as HTMLInputElement;
+  const res = document.getElementById('search-res')!;
+  const hint = document.getElementById('search-hint')!;
+  let items: Item[] | null = null;
+  let sel = 0;
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const reEsc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const mark = (text: string, terms: string[]) =>
+    terms.length ? esc(text).replace(new RegExp(`(${terms.map((t) => reEsc(esc(t))).join('|')})`, 'gi'), '<mark>$1</mark>') : esc(text);
+
+  function snippet(body: string, term: string) {
+    const i = body.toLowerCase().indexOf(term.toLowerCase());
+    if (i < 0) return '';
+    const s = Math.max(0, i - 40);
+    return (s > 0 ? '…' : '') + body.slice(s, i + 80) + '…';
+  }
+
+  function render() {
+    const terms = q.value.trim().split(/\s+/).filter(Boolean);
+    if (!items || terms.length === 0) { res.innerHTML = ''; hint.textContent = items ? '검색어를 입력하세요.' : '불러오는 중…'; hint.hidden = false; return; }
+    const scored = items
+      .map((it) => {
+        const head = `${it.title} ${it.tags.join(' ')}`.toLowerCase();
+        const all = `${head} ${it.description} ${it.body}`.toLowerCase();
+        if (!terms.every((t) => all.includes(t.toLowerCase()))) return null;
+        const score = terms.reduce((n, t) => n + (head.includes(t.toLowerCase()) ? 10 : 0) + (it.description.toLowerCase().includes(t.toLowerCase()) ? 3 : 1), 0);
+        return { it, score };
+      })
+      .filter((x): x is { it: Item; score: number } => !!x)
+      .sort((a, b) => b.score - a.score);
+    sel = 0;
+    hint.hidden = scored.length > 0;
+    hint.textContent = '찾는 글이 없어요.';
+    res.innerHTML = scored
+      .map(({ it }, n) => {
+        const snip = it.description.toLowerCase().includes(terms[0].toLowerCase()) ? it.description : snippet(it.body, terms[0]) || it.description;
+        return `<li style="--n:${n}"><a href="${it.url}"${n === 0 ? ' class="on"' : ''}>
+          <span class="sr-meta">${it.date} · ${it.tags.map((t, i) => (i ? '#' : '') + esc(t)).join(' ')}</span>
+          <span class="sr-t">${mark(it.title, terms)}</span>
+          <span class="sr-d">${mark(snip, terms)}</span></a></li>`;
+      })
+      .join('');
+  }
+
+  async function open() {
+    box.hidden = false;
+    requestAnimationFrame(() => box.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+    q.focus();
+    q.select();
+    if (!items) {
+      render();
+      try { items = await (await fetch('/search.json')).json(); } catch { items = []; }
+      render();
+    }
+  }
+  function close() {
+    box.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { if (!box.classList.contains('open')) box.hidden = true; }, 220);
+  }
+  function move(d: number) {
+    const links = [...res.querySelectorAll('a')];
+    if (!links.length) return;
+    links[sel]?.classList.remove('on');
+    sel = (sel + d + links.length) % links.length;
+    links[sel].classList.add('on');
+    links[sel].scrollIntoView({ block: 'nearest' });
+  }
+
+  q.addEventListener('input', render);
+  box.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
+  document.querySelectorAll('[data-open-search]').forEach((b) => b.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.documentElement.classList.remove('sb-open');
+    open();
+  }));
+  document.addEventListener('keydown', (e) => {
+    const typing = e.target instanceof HTMLElement && /INPUT|TEXTAREA/.test(e.target.tagName);
+    if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) { e.preventDefault(); open(); return; }
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'Enter') { const a = res.querySelectorAll('a')[sel]; if (a) location.href = a.href; }
+  });
+</script>

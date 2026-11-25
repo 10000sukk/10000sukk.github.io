@@ -1,13 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import { HOME_SUB_POSTS, SITE_TAGLINE, SITE_TITLE } from '../consts';
-import { formatDate, getPosts, homeSections, postHref, tagHref } from '../lib/posts';
+import { categorySet, formatDate, getPosts, homeSections, postHref, tagHref } from '../lib/posts';
 
-const sections = homeSections(await getPosts(), HOME_SUB_POSTS);
+const posts = await getPosts();
+const sections = homeSections(posts, HOME_SUB_POSTS);
+const cats = categorySet(posts);
+const label = (t: string) => (cats.has(t) ? t : `#${t}`);
 ---
 <Base activePage="home">
   <div class="topbar">
-    <h1 class="mast">{SITE_TITLE}<i>.</i></h1>
+    <h1 class="mast"><img src="/logo.png" alt={SITE_TITLE} width="64" height="64" /></h1>
     <span class="mast-sub">{SITE_TAGLINE}</span>
   </div>
 
@@ -16,7 +19,7 @@ const sections = homeSections(await getPosts(), HOME_SUB_POSTS);
   {sections.map(({ tag, total, featured, rest }, i) => (
     <section class="tsec">
       <div class="thead">
-        <div class="tname">{tag}<small>{total} posts</small></div>
+        <a class="tname" href={tagHref(tag)}><span class="hl">{tag}</span><small>{total}</small></a>
         <a class="more" href={tagHref(tag)}>더 보기 →</a>
       </div>
       <a class:list={['feat', { flip: i % 2 === 1, noimg: !featured.data.cover }]} href={postHref(featured)}>
@@ -24,6 +27,7 @@ const sections = homeSections(await getPosts(), HOME_SUB_POSTS);
           <div class="kick">대표 글 · {formatDate(featured.data.date)}</div>
           <h2>{featured.data.title}</h2>
           <p>{featured.data.description}</p>
+          {featured.data.tags.length > 1 && <div class="htags">{featured.data.tags.slice(1).map((t) => <span class="htag">{label(t)}</span>)}</div>}
         </div>
         {featured.data.cover && <img class="img" src={featured.data.cover} alt="" loading="lazy" />}
       </a>
@@ -34,6 +38,7 @@ const sections = homeSections(await getPosts(), HOME_SUB_POSTS);
               <div class="k">{formatDate(p.data.date)}</div>
               <h3>{p.data.title}</h3>
               <p>{p.data.description}</p>
+              {p.data.tags.length > 1 && <div class="htags">{p.data.tags.slice(1).map((t) => <span class="htag">{label(t)}</span>)}</div>}
             </a>
           ))}
         </div>

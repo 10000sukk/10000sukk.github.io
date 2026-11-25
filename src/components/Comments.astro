@@ -1,0 +1,24 @@
+---
+import { GISCUS } from '../consts';
+---
+<section class="comments">
+  <h2 class="comments-h"><span class="hl">댓글</span></h2>
+  <p class="comments-note">GitHub 계정으로 남길 수 있어요.</p>
+  <script
+    is:inline
+    src="https://giscus.app/client.js"
+    data-repo={GISCUS.repo}
+    data-repo-id={GISCUS.repoId}
+    data-category={GISCUS.category}
+    data-category-id={GISCUS.categoryId}
+    data-mapping="pathname"
+    data-strict="1"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="light"
+    data-lang="ko"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+</section>

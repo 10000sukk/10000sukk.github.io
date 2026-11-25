@@ -11,3 +11,11 @@ export const LINKS: { label: string; href: string; note?: string; icon?: 'github
   { label: 'Instagram', href: 'https://instagram.com/10000sukk', note: '@10000sukk', icon: 'instagram' },
   { label: '협업 제안', href: 'https://ig.me/m/10000sukk', note: '인스타 DM 으로 보내 주세요', icon: 'dm', primary: true },
 ];
+
+// Comments: giscus (GitHub Discussions of this repo, "Announcements" category).
+export const GISCUS = {
+  repo: '10000sukk/10000sukk.github.io',
+  repoId: 'R_kgDOKhuqzg',
+  category: 'Announcements',
+  categoryId: 'DIC_kwDOKhuqzs4DL717',
+};

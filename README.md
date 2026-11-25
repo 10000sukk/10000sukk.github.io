@@ -19,8 +19,8 @@ npm run build    # dist/ — 실제 배포본, 초안은 빠진다
 title: "글 제목"
 description: "목록과 검색 결과에 보일 한두 줄 요약"
 date: 2026-11-25
-tags: [macOS, Swift]      # 첫 번째 태그의 홈 섹션에 나온다. 태그 페이지에는 전부 나온다.
-featured: [macOS]         # (선택) 이 태그의 대표 글로 지정. 없으면 그 태그의 최신 글이 대표.
+tags: [프로젝트, Snipboard]  # 첫 번째 = 카테고리(홈 섹션). 두 번째부터는 #태그 (프로젝트 글이면 프로젝트 이름).
+featured: [프로젝트]      # (선택) 이 태그의 대표 글로 지정. 없으면 그 태그의 최신 글이 대표.
 cover: /covers/snipboard.png   # (선택) public/covers/ 에 넣은 이미지
 draft: true               # (선택) true 면 로컬에서만 보이고 배포되지 않는다
 ---

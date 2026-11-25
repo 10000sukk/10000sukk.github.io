@@ -29,6 +29,11 @@ export function tagsAlphabetical(posts: Post[]): { tag: string; count: number }[
     .sort((a, b) => a.tag.localeCompare(b.tag, 'ko', { sensitivity: 'base' }));
 }
 
+/** Categories are the tags used as a post's first tag; every other tag is a plain tag (e.g. a project name). */
+export function categorySet(posts: Post[]): Set<string> {
+  return new Set(posts.map((p) => p.data.tags[0]));
+}
+
 /**
  * Home sections: one per *primary* tag (a post's first tag), ordered by the
  * section's most recent post. The featured post is the newest post that lists

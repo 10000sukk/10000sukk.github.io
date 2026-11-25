@@ -3,26 +3,28 @@ import type { GetStaticPaths, Page } from 'astro';
 import Base from '../../../layouts/Base.astro';
 import BackBar from '../../../components/BackBar.astro';
 import { SITE_TITLE, TAG_PAGE_SIZE } from '../../../consts';
-import { formatDate, getPosts, postHref, postsByTag, tagHref, tagSlug, type Post } from '../../../lib/posts';
+import { categorySet, formatDate, getPosts, postHref, postsByTag, tagHref, tagSlug, type Post } from '../../../lib/posts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const byTag = postsByTag(await getPosts());
+  const all = await getPosts();
+  const byTag = postsByTag(all);
+  const cats = categorySet(all);
   return [...byTag].flatMap(([tag, posts]) =>
-    paginate(posts, { params: { tag: tagSlug(tag) }, props: { tagName: tag }, pageSize: TAG_PAGE_SIZE }),
+    paginate(posts, { params: { tag: tagSlug(tag) }, props: { tagName: tag, isCategory: cats.has(tag) }, pageSize: TAG_PAGE_SIZE }),
   );
 }) satisfies GetStaticPaths;
 
-interface Props { page: Page<Post>; tagName: string }
-const { page, tagName } = Astro.props;
+interface Props { page: Page<Post>; tagName: string; isCategory: boolean }
+const { page, tagName, isCategory } = Astro.props;
 const base = tagHref(tagName);
 const pageHref = (n: number) => (n === 1 ? base : `${base}${n}/`);
 ---
 <Base title={tagName} activeTag={tagName} description={`${tagName} 태그의 글 ${page.total}개`}>
-  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: '태그' }, { label: tagName }]} />
+  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: isCategory ? '카테고리' : '태그' }, { label: tagName }]} />
 
   <div class="tagh">
-    <div class="k">TAG</div>
-    <h1>{tagName}</h1>
+    <div class="k"><span class="cat-k">{isCategory ? 'Category' : 'Tag'}</span></div>
+    <h1>{isCategory ? <span class="hl">{tagName}</span> : `#${tagName}`}</h1>
     <p>{page.total}개의 글 · 최신순</p>
   </div>
 
@@ -30,8 +32,8 @@ const pageHref = (n: number) => (n === 1 ? base : `${base}${n}/`);
     {page.data.map((p) => (
       <a href={postHref(p)}>
         <div class="d">{formatDate(p.data.date)}</div>
-        <div><h3>{p.data.title}</h3><p>{p.data.description}</p></div>
-        {p.data.cover ? <img src={p.data.cover} alt="" loading="lazy" /> : <div class="ph"></div>}
+        <div><h3>{p.data.title}</h3><p>{p.data.description}</p>{p.data.tags.length > 1 && <div class="htags">{p.data.tags.filter((t) => t !== tagName).map((t) => <span class="htag">{t === p.data.tags[0] ? t : `#${t}`}</span>)}</div>}</div>
+        {p.data.cover && <img src={p.data.cover} alt="" loading="lazy" />}
       </a>
     ))}
   </div>
