@@ -1,0 +1,50 @@
+---
+import type { GetStaticPaths, Page } from 'astro';
+import Base from '../../../layouts/Base.astro';
+import BackBar from '../../../components/BackBar.astro';
+import { SITE_TITLE, TAG_PAGE_SIZE } from '../../../consts';
+import { formatDate, getPosts, postHref, postsByTag, tagHref, tagSlug, type Post } from '../../../lib/posts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const byTag = postsByTag(await getPosts());
+  return [...byTag].flatMap(([tag, posts]) =>
+    paginate(posts, { params: { tag: tagSlug(tag) }, props: { tagName: tag }, pageSize: TAG_PAGE_SIZE }),
+  );
+}) satisfies GetStaticPaths;
+
+interface Props { page: Page<Post>; tagName: string }
+const { page, tagName } = Astro.props;
+const base = tagHref(tagName);
+const pageHref = (n: number) => (n === 1 ? base : `${base}${n}/`);
+---
+<Base title={tagName} activeTag={tagName} description={`${tagName} 태그의 글 ${page.total}개`}>
+  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: '태그' }, { label: tagName }]} />
+
+  <div class="tagh">
+    <div class="k">TAG</div>
+    <h1>{tagName}</h1>
+    <p>{page.total}개의 글 · 최신순</p>
+  </div>
+
+  <div class="tlist">
+    {page.data.map((p) => (
+      <a href={postHref(p)}>
+        <div class="d">{formatDate(p.data.date)}</div>
+        <div><h3>{p.data.title}</h3><p>{p.data.description}</p></div>
+        {p.data.cover ? <img src={p.data.cover} alt="" loading="lazy" /> : <div class="ph"></div>}
+      </a>
+    ))}
+  </div>
+
+  {page.lastPage > 1 && (
+    <nav class="pager">
+      {page.url.prev && <a href={page.url.prev}>← 이전</a>}
+      {Array.from({ length: page.lastPage }, (_, i) => i + 1).map((n) =>
+        n === page.currentPage ? <span class="on">{n}</span> : <a href={pageHref(n)}>{n}</a>,
+      )}
+      {page.url.next && <a href={page.url.next}>다음 →</a>}
+    </nav>
+  )}
+
+  <footer class="site">© {new Date().getFullYear()} {SITE_TITLE}</footer>
+</Base>

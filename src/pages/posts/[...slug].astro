@@ -1,0 +1,47 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import BackBar from '../../components/BackBar.astro';
+import { SITE_TITLE } from '../../consts';
+import { formatDate, getPosts, postHref, readingMinutes, tagHref, type Post } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => {
+    // prev/next within the post's primary tag, newest first
+    const siblings = posts.filter((p) => p.data.tags[0] === post.data.tags[0]);
+    const i = siblings.indexOf(post);
+    return { params: { slug: post.id }, props: { post, older: siblings[i + 1], newer: siblings[i - 1] } };
+  });
+}) satisfies GetStaticPaths;
+
+interface Props { post: Post; older?: Post; newer?: Post }
+const { post, older, newer } = Astro.props;
+const { Content } = await render(post);
+const primary = post.data.tags[0];
+---
+<Base title={post.data.title} description={post.data.description} activeTag={primary} image={post.data.cover}>
+  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: primary, href: tagHref(primary) }, { label: '글' }]} fallback={tagHref(primary)} />
+
+  <header class="ph2">
+    <div class="chips">
+      {post.data.tags.map((t, i) => <a class:list={['chip', { first: i === 0 }]} href={tagHref(t)}>{t}</a>)}
+    </div>
+    <h1>{post.data.title}</h1>
+    <div class="m">{formatDate(post.data.date)} · {readingMinutes(post.body)}분 읽기{post.data.draft && ' · 초안'}</div>
+  </header>
+
+  {post.data.cover && <img class="pcover" src={post.data.cover} alt="" />}
+
+  <article class="prose"><Content /></article>
+
+  {(older || newer) && (
+    <nav class="pnav">
+      {older && <a href={postHref(older)}><small>← 이전 글</small><div>{older.data.title}</div></a>}
+      {newer && <a class="next" href={postHref(newer)}><small>다음 글 →</small><div>{newer.data.title}</div></a>}
+    </nav>
+  )}
+
+  <footer class="site">© {new Date().getFullYear()} {SITE_TITLE}</footer>
+</Base>

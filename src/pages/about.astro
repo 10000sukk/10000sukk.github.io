@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import BackBar from '../components/BackBar.astro';
+import { GITHUB_URL, SITE_TITLE } from '../consts';
+---
+<Base title="소개" activePage="about">
+  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: '소개' }]} />
+  <header class="ph2">
+    <h1>안녕하세요, {SITE_TITLE} 입니다.</h1>
+  </header>
+  <article class="prose">
+    <p>광고 추천 서빙을 개발하는 백엔드 엔지니어입니다. 퇴근 후에는 필요한 걸 직접 만들고, 그 과정에서 막히고 배운 것을 이곳에 적습니다.</p>
+    <p>만든 것들의 코드는 <a href={GITHUB_URL}>GitHub</a> 에 있습니다.</p>
+  </article>
+  <footer class="site">© {new Date().getFullYear()} {SITE_TITLE}</footer>
+</Base>

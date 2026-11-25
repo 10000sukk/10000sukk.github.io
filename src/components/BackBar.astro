@@ -1,0 +1,27 @@
+---
+interface Crumb { label: string; href?: string }
+interface Props { crumbs: Crumb[]; fallback?: string }
+const { crumbs, fallback = '/' } = Astro.props;
+---
+<div class="topbar">
+  <button class="back" type="button" data-fallback={fallback}>← 뒤로</button>
+  <span class="crumbs">
+    {crumbs.map((c, i) => (
+      <>
+        {i > 0 && ' / '}
+        {c.href ? <a href={c.href}>{c.label}</a> : c.label}
+      </>
+    ))}
+  </span>
+</div>
+
+<script>
+  // Go back within the site when we came from it; otherwise go to the fallback page.
+  document.querySelectorAll<HTMLButtonElement>('button.back').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sameOrigin = document.referrer && new URL(document.referrer).origin === location.origin;
+      if (sameOrigin && history.length > 1) history.back();
+      else location.href = btn.dataset.fallback || '/';
+    });
+  });
+</script>

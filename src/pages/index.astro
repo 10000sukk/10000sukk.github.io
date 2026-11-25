@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { HOME_SUB_POSTS, SITE_TAGLINE, SITE_TITLE } from '../consts';
+import { formatDate, getPosts, homeSections, postHref, tagHref } from '../lib/posts';
+
+const sections = homeSections(await getPosts(), HOME_SUB_POSTS);
+---
+<Base activePage="home">
+  <div class="topbar">
+    <h1 class="mast">{SITE_TITLE}<i>.</i></h1>
+    <span class="mast-sub">{SITE_TAGLINE}</span>
+  </div>
+
+  {sections.length === 0 && <p class="empty">아직 글이 없어요.</p>}
+
+  {sections.map(({ tag, total, featured, rest }, i) => (
+    <section class="tsec">
+      <div class="thead">
+        <div class="tname">{tag}<small>{total} posts</small></div>
+        <a class="more" href={tagHref(tag)}>더 보기 →</a>
+      </div>
+      <a class:list={['feat', { flip: i % 2 === 1, noimg: !featured.data.cover }]} href={postHref(featured)}>
+        <div class="ftxt">
+          <div class="kick">대표 글 · {formatDate(featured.data.date)}</div>
+          <h2>{featured.data.title}</h2>
+          <p>{featured.data.description}</p>
+        </div>
+        {featured.data.cover && <img class="img" src={featured.data.cover} alt="" loading="lazy" />}
+      </a>
+      {rest.length > 0 && (
+        <div class="subs">
+          {rest.map((p) => (
+            <a href={postHref(p)}>
+              <div class="k">{formatDate(p.data.date)}</div>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.description}</p>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+  ))}
+
+  <footer class="site">© {new Date().getFullYear()} {SITE_TITLE} — built with Astro</footer>
+</Base>

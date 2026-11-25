@@ -1,0 +1,8 @@
+---
+import Base from '../layouts/Base.astro';
+import BackBar from '../components/BackBar.astro';
+---
+<Base title="페이지를 찾을 수 없어요">
+  <BackBar crumbs={[{ label: '홈', href: '/' }, { label: '404' }]} />
+  <p class="empty">페이지를 찾을 수 없어요. <a href="/" style="text-decoration:underline">홈으로</a></p>
+</Base>

@@ -1,0 +1,35 @@
+---
+import { GITHUB_URL, SITE_TITLE } from '../consts';
+import { getPosts, tagsAlphabetical, tagHref } from '../lib/posts';
+
+interface Props { activeTag?: string; activePage?: 'home' | 'about' }
+const { activeTag, activePage } = Astro.props;
+const tags = tagsAlphabetical(await getPosts());
+---
+<aside class="sidebar">
+  <div class="sb-top">
+    <a class="sb-brand" href="/"><img src="/logo.png" alt="" /><span>{SITE_TITLE}</span></a>
+    <button class="sb-toggle" id="sb-toggle" type="button" aria-label="메뉴 접기/펼치기">
+      <span class="when-open">⟨</span><span class="when-collapsed">☰</span>
+    </button>
+  </div>
+  <nav class="sb-nav">
+    <a href="/" class:list={[{ on: activePage === 'home' }]}>홈</a>
+    {tags.length > 0 && <div class="lab">Tags</div>}
+    {tags.map(({ tag, count }) => (
+      <a href={tagHref(tag)} class:list={[{ on: activeTag === tag }]}>{tag}<span>{count}</span></a>
+    ))}
+    <div class="lab">Links</div>
+    <a href="/about/" class:list={[{ on: activePage === 'about' }]}>소개</a>
+    <a href={GITHUB_URL} target="_blank" rel="noopener">GitHub ↗</a>
+  </nav>
+  <div class="sb-foot">© {new Date().getFullYear()} {SITE_TITLE}</div>
+</aside>
+
+<script>
+  const KEY = 'sb-collapsed';
+  document.getElementById('sb-toggle')?.addEventListener('click', () => {
+    const collapsed = document.documentElement.classList.toggle('sb-collapsed');
+    try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch {}
+  });
+</script>
