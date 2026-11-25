@@ -2,6 +2,7 @@
 title: "김프 차익거래 봇을 3년째 고치고 있다"
 description: "국내와 해외 거래소의 가격 차이를 노리는 자동 매매 시스템. Kotlin 과 Spring Boot 로 만들었고, 커밋이 800개를 넘었다."
 date: 2026-09-20
+category: 퀀트
 tags: [차익거래]
 cover: /covers/kimp-arbitrage.png
 ---

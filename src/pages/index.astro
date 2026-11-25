@@ -1,12 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import { HOME_SUB_POSTS, SITE_TAGLINE, SITE_TITLE } from '../consts';
-import { categorySet, formatDate, getPosts, homeSections, postHref, tagHref } from '../lib/posts';
+import { formatDate, getPosts, homeSections, labelText, postHref, tagHref } from '../lib/posts';
 
 const posts = await getPosts();
 const sections = homeSections(posts, HOME_SUB_POSTS);
-const cats = categorySet(posts);
-const label = (t: string) => (cats.has(t) ? t : `#${t}`);
 ---
 <Base activePage="home">
   <div class="topbar">
@@ -27,7 +25,7 @@ const label = (t: string) => (cats.has(t) ? t : `#${t}`);
           <div class="kick">대표 글 · {formatDate(featured.data.date)}</div>
           <h2>{featured.data.title}</h2>
           <p>{featured.data.description}</p>
-          {featured.data.tags.length > 1 && <div class="htags">{featured.data.tags.slice(1).map((t) => <span class="htag">{label(t)}</span>)}</div>}
+          {featured.data.tags.length > 0 && <div class="htags">{featured.data.tags.map((t) => <span class="htag">{labelText(t)}</span>)}</div>}
         </div>
         {featured.data.cover && <img class="img" src={featured.data.cover} alt="" loading="lazy" />}
       </a>
@@ -38,7 +36,7 @@ const label = (t: string) => (cats.has(t) ? t : `#${t}`);
               <div class="k">{formatDate(p.data.date)}</div>
               <h3>{p.data.title}</h3>
               <p>{p.data.description}</p>
-              {p.data.tags.length > 1 && <div class="htags">{p.data.tags.slice(1).map((t) => <span class="htag">{label(t)}</span>)}</div>}
+              {p.data.tags.length > 0 && <div class="htags">{p.data.tags.map((t) => <span class="htag">{labelText(t)}</span>)}</div>}
             </a>
           ))}
         </div>

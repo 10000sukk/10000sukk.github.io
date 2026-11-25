@@ -2,7 +2,8 @@
 title: "같은 필기 앱을 Flutter 로 Android·Windows 에"
 description: "Swift 앱은 그대로 두고, Android 와 Windows 용 앱을 Flutter 로 따로 만들었다. 공동작업은 CloudKit 을 직접 호출한다."
 date: 2026-11-23
-tags: [프로젝트, King Note]
+category: 프로젝트
+tags: [King Note]
 cover: /covers/kingnote-flutter.png
 ---
 

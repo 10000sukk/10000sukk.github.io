@@ -4,6 +4,11 @@ export const SITE_DESCRIPTION = '퇴근 후에 만든 것들의 기록.';
 export const GITHUB_URL = 'https://github.com/10000sukk';
 export const REPO_URL = 'https://github.com/10000sukk/10000sukk.github.io';
 export const REPO_BRANCH = 'master';
+// Categories: the topics a post can belong to (frontmatter `category:`). Only these are allowed —
+// a typo fails the build. Add a new one here first. Categories with no posts are hidden.
+export const CATEGORIES = ['프로젝트', '일상', '운동', '퀀트'] as const;
+export type Category = (typeof CATEGORIES)[number];
+
 export const HOME_SUB_POSTS = 3; // latest posts shown under each featured post
 export const TAG_PAGE_SIZE = 10;
 

@@ -2,7 +2,8 @@
 title: "파이썬 서비스 Dockerfile 에 꼭 넣는 세 줄"
 description: "로그가 안 보이고, 시간이 9시간 어긋나고, 컨테이너가 root 로 돈다. 셋 다 한 줄씩이면 막을 수 있다."
 date: 2026-06-01
-tags: [프로젝트, 쇼츠 생성기]
+category: 프로젝트
+tags: [쇼츠 생성기]
 cover: /covers/python-docker.png
 ---
 

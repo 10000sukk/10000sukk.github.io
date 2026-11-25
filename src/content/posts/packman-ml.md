@@ -2,7 +2,8 @@
 title: "차익 기회가 다시 올지 로지스틱 회귀로 맞혀 보기"
 description: "한 번 벌어진 가격 차이가 하루 안에 다시 벌어질까. 쌓아 둔 틱으로 라벨을 만들고 작은 모델을 학습했다."
 date: 2026-02-10
-tags: [퀀트, 차익거래]
+category: 퀀트
+tags: [차익거래]
 cover: /covers/packman-ml.png
 ---
 

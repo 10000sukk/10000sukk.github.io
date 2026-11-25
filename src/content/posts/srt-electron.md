@@ -2,7 +2,7 @@
 title: "처음 만든 데스크톱 앱, Electron"
 description: "기차표 취소표를 기다리다 지쳐서 만든 작은 데스크톱 앱. Electron 과 React, 그리고 자동 업데이트."
 date: 2024-05-26
-tags: [프로젝트]
+category: 프로젝트
 cover: /covers/srt-electron.png
 ---
 

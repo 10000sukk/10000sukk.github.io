@@ -2,7 +2,8 @@
 title: "Go 바이너리 하나에 웹앱 전체를 넣기"
 description: "React 빌드 결과를 go:embed 로 실행 파일에 넣었다. 서버에 필요한 건 실행 파일 하나와 MySQL 뿐이다."
 date: 2026-08-16
-tags: [프로젝트, 자산 트래커]
+category: 프로젝트
+tags: [자산 트래커]
 cover: /covers/asset-tracker-go.png
 ---
 

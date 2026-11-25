@@ -2,7 +2,8 @@
 title: "클립보드 매니저를 직접 만든 이유"
 description: "기존 앱에 아쉬웠던 건 두 가지였다. 개발하면서 복사하는 것들을 잘 다루는 것, 그리고 비밀 값은 남기지 않는 것."
 date: 2026-11-20
-tags: [프로젝트, Snipboard]
+category: 프로젝트
+tags: [Snipboard]
 cover: /covers/snipboard-why.png
 ---
 

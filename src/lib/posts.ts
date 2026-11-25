@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { CATEGORIES } from '../consts';
 
 export type Post = CollectionEntry<'posts'>;
 
@@ -15,10 +16,13 @@ export const postHref = (post: Post) => `/posts/${post.id}/`;
 export const formatDate = (d: Date) =>
   `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 
-/** Every tag with its posts (a post counts for all of its tags). */
+/** A post's labels: its category first, then its tags (deduplicated). */
+export const labels = (p: Post): string[] => [...new Set([p.data.category, ...p.data.tags])];
+
+/** Every label (category or tag) with its posts. A post counts for its category and all of its tags. */
 export function postsByTag(posts: Post[]): Map<string, Post[]> {
   const map = new Map<string, Post[]>();
-  for (const p of posts) for (const t of p.data.tags) map.set(t, [...(map.get(t) ?? []), p]);
+  for (const p of posts) for (const t of labels(p)) map.set(t, [...(map.get(t) ?? []), p]);
   return map;
 }
 
@@ -29,20 +33,21 @@ export function tagsAlphabetical(posts: Post[]): { tag: string; count: number }[
     .sort((a, b) => a.tag.localeCompare(b.tag, 'ko', { sensitivity: 'base' }));
 }
 
-/** Categories are the tags used as a post's first tag; every other tag is a plain tag (e.g. a project name). */
-export function categorySet(posts: Post[]): Set<string> {
-  return new Set(posts.map((p) => p.data.tags[0]));
-}
+/** The fixed category list from src/consts.ts. Everything else is a plain tag. */
+const CATEGORY_SET = new Set<string>(CATEGORIES);
+export const isCategory = (name: string) => CATEGORY_SET.has(name);
+/** Display name: categories as-is, tags with a leading #. */
+export const labelText = (name: string) => (isCategory(name) ? name : `#${name}`);
 
 /**
- * Home sections: one per *primary* tag (a post's first tag), ordered by the
+ * Home sections: one per category, ordered by the
  * section's most recent post. The featured post is the newest post that lists
  * the tag in `featured`; otherwise the newest post of the section.
  */
 export function homeSections(posts: Post[], subCount: number) {
   const byPrimary = new Map<string, Post[]>();
   for (const p of posts) {
-    const t = p.data.tags[0];
+    const t = p.data.category;
     byPrimary.set(t, [...(byPrimary.get(t) ?? []), p]);
   }
   const all = postsByTag(posts);

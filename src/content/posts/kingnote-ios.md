@@ -2,7 +2,8 @@
 title: "PDF 옆에 여백 노트를 붙인 필기 앱"
 description: "iPhone·iPad·Mac 에서 PDF 에 필기하고, 페이지마다 옆에 따로 노트를 둔다."
 date: 2026-11-22
-tags: [프로젝트, King Note]
+category: 프로젝트
+tags: [King Note]
 cover: /covers/kingnote-ios.png
 ---
 

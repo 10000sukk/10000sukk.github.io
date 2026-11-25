@@ -2,7 +2,8 @@
 title: "쇼츠를 자동으로 만드는 파이프라인"
 description: "인기글을 모아 점수를 매기고, 사람이 고른 것만 영상으로 렌더링한다. 사람 손은 고르는 단계에만 남겼다."
 date: 2026-06-04
-tags: [프로젝트, 쇼츠 생성기]
+category: 프로젝트
+tags: [쇼츠 생성기]
 cover: /covers/shorts-pipeline.png
 ---
 

@@ -2,7 +2,8 @@
 title: "빠뜨린 주 때문에 그래프가 꺼지지 않게"
 description: "한 계좌를 입력하지 않은 주에 총액이 급락해 보이는 문제. 마지막 값을 이월하고 화면에 '이월' 배지로 표시했다."
 date: 2026-08-17
-tags: [프로젝트, 자산 트래커]
+category: 프로젝트
+tags: [자산 트래커]
 cover: /covers/asset-tracker-react.png
 ---
 

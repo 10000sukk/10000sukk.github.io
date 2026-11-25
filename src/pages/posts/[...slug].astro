@@ -5,13 +5,13 @@ import Base from '../../layouts/Base.astro';
 import BackBar from '../../components/BackBar.astro';
 import Comments from '../../components/Comments.astro';
 import { REPO_BRANCH, REPO_URL, SITE_TITLE } from '../../consts';
-import { formatDate, getPosts, postHref, readingMinutes, tagHref, type Post } from '../../lib/posts';
+import { formatDate, getPosts, labelText, labels, postHref, readingMinutes, tagHref, type Post } from '../../lib/posts';
 
 export const getStaticPaths = (async () => {
   const posts = await getPosts();
   return posts.map((post) => {
-    // prev/next within the post's primary tag, newest first
-    const siblings = posts.filter((p) => p.data.tags[0] === post.data.tags[0]);
+    // prev/next within the post's category, newest first
+    const siblings = posts.filter((p) => p.data.category === post.data.category);
     const i = siblings.indexOf(post);
     return { params: { slug: post.id }, props: { post, older: siblings[i + 1], newer: siblings[i - 1] } };
   });
@@ -20,7 +20,7 @@ export const getStaticPaths = (async () => {
 interface Props { post: Post; older?: Post; newer?: Post }
 const { post, older, newer } = Astro.props;
 const { Content } = await render(post);
-const primary = post.data.tags[0];
+const primary = post.data.category;
 const file = post.filePath ?? `src/content/posts/${post.id}.md`;
 const editUrl = `${REPO_URL}/edit/${REPO_BRANCH}/${file}`;
 const deleteUrl = `${REPO_URL}/delete/${REPO_BRANCH}/${file}`;
@@ -30,7 +30,7 @@ const deleteUrl = `${REPO_URL}/delete/${REPO_BRANCH}/${file}`;
 
   <header class="ph2">
     <div class="chips">
-      {post.data.tags.map((t, i) => <a class:list={['chip', { first: i === 0 }]} href={tagHref(t)}>{i === 0 ? t : `#${t}`}</a>)}
+      {labels(post).map((t, i) => <a class:list={['chip', { first: i === 0 }]} href={tagHref(t)}>{labelText(t)}</a>)}
     </div>
     <h1>{post.data.title}</h1>
     <div class="m">{formatDate(post.data.date)} · {readingMinutes(post.body)}분 읽기{post.data.draft && ' · 초안'}</div>

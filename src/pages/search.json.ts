@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { formatDate, getPosts, postHref } from '../lib/posts';
+import { formatDate, getPosts, labels, postHref } from '../lib/posts';
 
 // Plain-text index for the client-side search (small blog → one JSON file is enough).
 const plain = (md = '') =>
@@ -16,7 +16,7 @@ export const GET: APIRoute = async () => {
   const items = posts.map((p) => ({
     title: p.data.title,
     description: p.data.description,
-    tags: p.data.tags,
+    tags: labels(p),
     date: formatDate(p.data.date),
     url: postHref(p),
     body: plain(p.body),

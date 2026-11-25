@@ -3,14 +3,13 @@ import type { GetStaticPaths, Page } from 'astro';
 import Base from '../../../layouts/Base.astro';
 import BackBar from '../../../components/BackBar.astro';
 import { SITE_TITLE, TAG_PAGE_SIZE } from '../../../consts';
-import { categorySet, formatDate, getPosts, postHref, postsByTag, tagHref, tagSlug, type Post } from '../../../lib/posts';
+import { formatDate, getPosts, isCategory as isCat, labelText, labels, postHref, postsByTag, tagHref, tagSlug, type Post } from '../../../lib/posts';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const all = await getPosts();
   const byTag = postsByTag(all);
-  const cats = categorySet(all);
   return [...byTag].flatMap(([tag, posts]) =>
-    paginate(posts, { params: { tag: tagSlug(tag) }, props: { tagName: tag, isCategory: cats.has(tag) }, pageSize: TAG_PAGE_SIZE }),
+    paginate(posts, { params: { tag: tagSlug(tag) }, props: { tagName: tag, isCategory: isCat(tag) }, pageSize: TAG_PAGE_SIZE }),
   );
 }) satisfies GetStaticPaths;
 
@@ -32,7 +31,7 @@ const pageHref = (n: number) => (n === 1 ? base : `${base}${n}/`);
     {page.data.map((p) => (
       <a href={postHref(p)}>
         <div class="d">{formatDate(p.data.date)}</div>
-        <div><h3>{p.data.title}</h3><p>{p.data.description}</p>{p.data.tags.length > 1 && <div class="htags">{p.data.tags.filter((t) => t !== tagName).map((t) => <span class="htag">{t === p.data.tags[0] ? t : `#${t}`}</span>)}</div>}</div>
+        <div><h3>{p.data.title}</h3><p>{p.data.description}</p>{labels(p).length > 1 && <div class="htags">{labels(p).filter((t) => t !== tagName).map((t) => <span class="htag">{labelText(t)}</span>)}</div>}</div>
         {p.data.cover && <img src={p.data.cover} alt="" loading="lazy" />}
       </a>
     ))}

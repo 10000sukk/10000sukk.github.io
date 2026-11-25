@@ -105,7 +105,7 @@ const ogImage = new URL(image ?? '/logo.png', Astro.site);
         a.addEventListener('click', () => {
           const d = new Date();
           const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          const tpl = `---\ntitle: "제목"\ndescription: "목록에 보일 한두 줄 요약"\ndate: ${day}\ntags: [프로젝트]   # 첫 번째 = 카테고리(프로젝트·일상·운동·퀀트·차익거래), 두 번째부터 #태그\n# cover: /covers/파일이름.png\n---\n\n본문은 마크다운으로.\n`;
+          const tpl = `---\ntitle: "제목"\ndescription: "목록에 보일 한두 줄 요약"\ndate: ${day}\ncategory: 프로젝트   # 프로젝트 · 일상 · 운동 · 퀀트 중 하나\ntags: []            # (선택) 프로젝트 이름 같은 #태그\n# cover: /covers/파일이름.png\n---\n\n본문은 마크다운으로.\n`;
           a.href = `${a.dataset.newPost}?filename=${day}-new-post.md&value=${encodeURIComponent(tpl)}`;
         }),
       );

@@ -1,14 +1,13 @@
 ---
 import { GITHUB_URL, REPO_BRANCH, REPO_URL, SITE_TITLE } from '../consts';
-import { categorySet, getPosts, tagsAlphabetical, tagHref } from '../lib/posts';
+import { getPosts, isCategory, tagsAlphabetical, tagHref } from '../lib/posts';
 
 interface Props { activeTag?: string; activePage?: 'home' | 'about' }
 const { activeTag, activePage } = Astro.props;
 const posts = await getPosts();
-const cats = categorySet(posts);
 const all = tagsAlphabetical(posts);
-const categories = all.filter((t) => cats.has(t.tag));
-const tags = all.filter((t) => !cats.has(t.tag));
+const categories = all.filter((t) => isCategory(t.tag));
+const tags = all.filter((t) => !isCategory(t.tag));
 let n = 0; // stagger index for the nav items
 const i = () => `--i:${n++}`;
 ---

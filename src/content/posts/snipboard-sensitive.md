@@ -2,7 +2,8 @@
 title: "비밀 값은 클립보드 기록에 남기지 않기"
 description: "비밀번호 관리자가 붙이는 표시를 존중하고, 토큰처럼 생긴 문자열은 정규식으로 걸러낸다."
 date: 2026-11-19
-tags: [프로젝트, Snipboard]
+category: 프로젝트
+tags: [Snipboard]
 cover: /covers/snipboard-sensitive.png
 ---
 
