@@ -68,8 +68,12 @@ const ogImage = new URL(image ?? '/logo.png', Astro.site);
         const io = new IntersectionObserver((entries) => {
           entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
         }, { rootMargin: '0px 0px -8% 0px' });
-        items.forEach((el, n) => {
-          (el as HTMLElement).style.setProperty('--d', `${Math.min(n % 6, 5) * 60}ms`);
+        // Only animate what is still below the fold. Things already on screen stay put,
+        // otherwise they'd flash (visible → hidden → fade in) on top of the page transition.
+        let n = 0;
+        items.forEach((el) => {
+          if (el.getBoundingClientRect().top < innerHeight) return;
+          (el as HTMLElement).style.setProperty('--d', `${Math.min(n++ % 4, 3) * 50}ms`);
           el.classList.add('rv');
           io.observe(el);
         });
